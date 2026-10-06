@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="有律可循——面向学习场景的条文检索与智能问答平台。">
+  <title>有律可循｜条文检索与智能问答平台</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102036'/%3E%3Cpath d='M17 17h30v5H35v25h-6V22H17z' fill='%23f4efe5'/%3E%3Ccircle cx='46' cy='46' r='8' fill='%23c9483b'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="有律可循首页">
+      <span class="brand-mark" aria-hidden="true">循</span>
+      <span><strong>有律可循</strong><small>条文检索与智能问答平台</small></span>
+    </a>
+    <nav class="main-nav" aria-label="主导航">
+      <a href="#top">智能问答</a><a href="#topics">专题入口</a><a href="#library">条文库</a><a href="#dashboard">数据概览</a>
+    </nav>
+    <div class="top-actions"><button class="text-button" id="savedButton" type="button">历史与收藏</button><button class="text-button" id="aboutButton" type="button">数据说明</button></div>
+  </header>
+
+  <main id="top">
+    <section class="intro" aria-labelledby="pageTitle">
+      <p class="eyebrow">EVIDENCE-FIRST SEARCH</p>
+      <h1 id="pageTitle">让每一次查询，<br><em>都有条文依据。</em></h1>
+      <p class="intro-copy">输入生活中遇到的问题，从已经施行的规范文本中查找相关条文。回答保留原文与版本信息，方便继续核对。</p>
+      <div class="data-line" aria-live="polite">
+        <span class="pulse" aria-hidden="true"></span>
+        <span id="dataStatus">正在装载知识库…</span>
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="条文检索">
+      <form id="searchForm" class="search-panel">
+        <label for="question">你想了解什么？</label>
+        <textarea id="question" rows="3" maxlength="160" placeholder="例如：网购商品收到后不满意，可以退货吗？" required></textarea>
+        <div class="search-actions">
+          <select id="department" aria-label="筛选法律部门">
+            <option value="">全部领域</option>
+          </select>
+          <button class="primary-button" id="submitButton" type="submit" disabled>
+            <span>查找依据</span><kbd>Enter</kbd>
+          </button>
+        </div>
+      </form>
+
+      <div class="suggestions" aria-label="示例问题">
+        <span>可以这样问</span>
+        <button type="button" data-question="网购商品不满意可以退货吗？">网购退货</button>
+        <button type="button" data-question="公司解除劳动合同需要支付经济补偿吗？">解除劳动合同</button>
+        <button type="button" data-question="个人信息被他人泄露怎么办？">个人信息泄露</button>
+        <button type="button" data-question="未成年人的监护人有哪些责任？">未成年人监护</button>
+      </div>
+    </section>
+
+    <section id="answer" class="answer-section" aria-live="polite" hidden>
+      <div class="answer-heading">
+        <div><p class="eyebrow">RETRIEVAL RESULT</p><h2>检索结果</h2></div>
+        <button class="text-button" id="copyButton" type="button">复制摘要</button>
+      </div>
+      <article class="summary-card">
+        <span class="summary-label">初步结论</span>
+        <p id="conclusion" class="conclusion-text"></p>
+        <div class="summary-divider"></div>
+        <span class="summary-label">判断依据</span>
+        <p id="summary"></p>
+        <div class="answer-grid">
+          <div><span class="summary-label">关键条件</span><ul id="conditions"></ul></div>
+          <div><span class="summary-label">建议步骤</span><ol id="actions"></ol></div>
+        </div>
+        <div class="exception-box"><span class="summary-label">例外与边界</span><p id="exceptions"></p></div>
+        <div id="citations" class="citation-links" aria-label="引用依据"></div>
+        <div id="queryTags" class="query-tags"></div>
+      </article>
+      <section id="clarifyPanel" class="clarify-panel" hidden>
+        <div><span class="summary-label">补充事实后判断更准确</span><p id="clarifyQuestion"></p></div>
+        <div id="clarifyOptions" class="clarify-options"></div>
+      </section>
+      <div class="result-meta"><span id="resultCount"></span><span>按相关度排序</span></div>
+      <div id="results" class="results"></div>
+    </section>
+
+    <section id="topics" class="content-section" aria-labelledby="topicsTitle">
+      <div class="section-heading"><div><p class="eyebrow">TOPIC GUIDES</p><h2 id="topicsTitle">按常见问题进入</h2></div><p>从八类高频生活场景开始检索。</p></div>
+      <div id="topicGrid" class="topic-grid"></div>
+    </section>
+
+    <section id="library" class="content-section library-section" aria-labelledby="libraryTitle">
+      <div class="section-heading"><div><p class="eyebrow">LAW LIBRARY</p><h2 id="libraryTitle">条文库</h2></div><p>按法律名称浏览当前适用版本。</p></div>
+      <div class="library-toolbar"><input id="lawSearch" type="search" placeholder="搜索法律名称，如：消费者权益保护法"><span id="lawCount">正在整理…</span></div>
+      <div id="lawList" class="law-list"></div>
+    </section>
+
+    <section id="dashboard" class="content-section dashboard-section" aria-labelledby="dashboardTitle">
+      <div class="section-heading"><div><p class="eyebrow">DATA OVERVIEW</p><h2 id="dashboardTitle">数据概览</h2></div><p>清洗后的知识库覆盖情况。</p></div>
+      <div id="metricGrid" class="metric-grid"></div><div id="departmentBars" class="department-bars"></div>
+    </section>
+
+    <section class="principles" aria-labelledby="principlesTitle">
+      <div><p class="eyebrow">HOW IT WORKS</p><h2 id="principlesTitle">先找依据，再读答案</h2></div>
+      <div class="principle-grid">
+        <article><span>01</span><h3>效力筛选</h3><p>默认排除已废止、已修改和尚未施行的版本。</p></article>
+        <article><span>02</span><h3>原文可见</h3><p>每条结果展示文件名称、条号、正文和版本日期。</p></article>
+        <article><span>03</span><h3>谨慎表达</h3><p>只概括检索关系，不把学习检索包装成专业意见。</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div><strong>有律可循</strong><span>个人学习与研究使用</span></div>
+    <p>数据整理日期：2026年10月6日。重要事项请以国家机关公布的正式文本为准。</p>
+  </footer>
+
+  <dialog id="aboutDialog">
+    <form method="dialog" class="dialog-card">
+      <button class="dialog-close" aria-label="关闭" value="close">×</button>
+      <p class="eyebrow">DATA NOTE</p>
+      <h2>关于这份知识库</h2>
+      <p>知识库由条文级JSONL数据自动清洗生成，当前检索库只保留截至2026年10月6日已经施行的适用版本。历史、废止与待施行内容已单独归档。</p>
+      <dl>
+        <div><dt>检索记录</dt><dd id="dialogRecords">—</dd></div>
+        <div><dt>文件版本</dt><dd id="dialogDocs">—</dd></div>
+        <div><dt>覆盖范围</dt><dd>宪法及全国性法律</dd></div>
+      </dl>
+      <p class="notice">效力状态部分来自数据集推定，系统不替代官方查询或专业意见。</p>
+    </form>
+  </dialog>
+
+  <dialog id="lawDialog" class="wide-dialog">
+    <div class="dialog-card"><button class="dialog-close" id="lawDialogClose" aria-label="关闭">×</button><p class="eyebrow">LAW DETAIL</p><h2 id="lawDialogTitle"></h2><p id="lawDialogMeta" class="dialog-meta"></p><input id="articleSearch" type="search" placeholder="在本法条文中搜索"><div id="articleList" class="article-list"></div></div>
+  </dialog>
+
+  <dialog id="savedDialog" class="wide-dialog">
+    <div class="dialog-card"><button class="dialog-close" id="savedDialogClose" aria-label="关闭">×</button><p class="eyebrow">YOUR DESK</p><h2>历史与收藏</h2><div class="saved-columns"><section><div class="saved-heading"><h3>最近检索</h3><button id="clearHistory" class="inline-button" type="button">清空</button></div><div id="historyList" class="saved-list"></div></section><section><div class="saved-heading"><h3>收藏条文</h3></div><div id="favoriteList" class="saved-list"></div></section></div></div>
+  </dialog>
+
+  <template id="resultTemplate">
+    <article class="result-card">
+      <div class="result-top"><span class="department-pill"></span><span class="score-label"></span></div>
+      <h3></h3>
+      <p class="chapter"></p>
+      <p class="provision"></p>
+      <div class="result-bottom"><span class="dates"></span><div class="card-actions"><button class="favorite-button" type="button">收藏</button><button class="expand-button" type="button">展开原文</button></div></div>
+    </article>
+  </template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
